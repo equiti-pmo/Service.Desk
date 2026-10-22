@@ -1,81 +1,1197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equiti Service Desk</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f3f2f1;
-            color: #242424;
-        }
-        .container {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            max-width: 400px;
-            width: 100%;
-        }
-        .logo {
-            width: 100%;
-            max-width: 180px;
-            height: auto;
-            margin-bottom: 24px;
-        }
-        h1 { margin-top: 0; font-size: 22px; }
-        p { color: #605e5c; margin-bottom: 24px; line-height: 1.5; }
-        .btn {
-            background-color: #15A5A3; /* Equiti Teal */
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 15px;
-            display: block;
-            margin-bottom: 12px;
-            transition: background-color 0.2s;
-        }
-        .btn:hover { background-color: #118482; }
-        .btn-secondary {
-            background-color: transparent;
-            color: #15A5A3;
-            border: 2px solid #15A5A3;
-            padding: 10px 22px; /* Adjusted to account for border */
-        }
-        .btn-secondary:hover {
-            background-color: #f4fbfb;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equiti Service Desk</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300AFAA'/><path d='M25 50h50M50 25v50' stroke='white' stroke-width='14' stroke-linecap='round'/></svg>">
+
+  <!-- Microsoft Teams JavaScript SDK -->
+  <script src="https://res.cdn.office.net/teams-js/2.22.0/js/MicrosoftTeams.min.js"></script>
+  <script>
+    // Initialize Teams SDK and send success signal
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof microsoftTeams !== "undefined" && microsoftTeams.app) {
+        microsoftTeams.app.initialize().then(() => {
+          // Tell Teams to remove the loading spinner and show the app
+          microsoftTeams.app.notifySuccess();
+
+          // Sync theme with Teams context
+          try {
+            microsoftTeams.app.getContext().then(function(context) {
+              if (context && context.app && context.app.theme) {
+                var isDark = context.app.theme === 'dark' || context.app.theme === 'contrast';
+                if (!localStorage.getItem('equiti-servicedesk-theme')) {
+                  if (window.applyAppTheme) window.applyAppTheme(isDark ? 'dark' : 'light');
+                }
+              }
+            });
+            microsoftTeams.app.registerOnThemeChangeHandler(function(theme) {
+              var isDark = theme === 'dark' || theme === 'contrast';
+              if (window.applyAppTheme) window.applyAppTheme(isDark ? 'dark' : 'light');
+              try { localStorage.setItem('equiti-servicedesk-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+            });
+          } catch (e) {
+            console.warn("Teams theme sync error:", e);
+          }
+        }).catch((error) => {
+          console.error("Teams initialization failed:", error);
+        });
+      }
+    });
+  </script>
+
+  <style>
+    /* Atlaskit / Atlassian Design System tokens */
+    :root {
+      --ds-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      
+      --ds-background-default: #F4F5F7;
+      --ds-surface: #FFFFFF;
+      --ds-surface-hovered: #FAFBFC;
+      --ds-surface-pressed: #F4F5F7;
+      --ds-surface-sunken: #EBECF0;
+      
+      --ds-border: #DFE1E6;
+      --ds-border-bold: #C1C7D0;
+      --ds-border-focused: #00AFAA;
+      
+      --ds-text: #172B4D;
+      --ds-text-subtle: #44546F;
+      --ds-text-subtlest: #6B778C;
+      --ds-text-inverse: #FFFFFF;
+      
+      --ds-link: #00AFAA;
+      --ds-link-hovered: #008783;
+      
+      --equiti-teal: #00AFAA;
+      --equiti-teal-hover: #009692;
+      --equiti-teal-subtle: rgba(0, 175, 170, 0.08);
+      --equiti-teal-border: rgba(0, 175, 170, 0.25);
+      
+      --ds-shadow-card: 0 1px 1px rgba(9, 30, 66, 0.08), 0 0 1px rgba(9, 30, 66, 0.16);
+      --ds-shadow-card-hover: 0 4px 8px -2px rgba(9, 30, 66, 0.12), 0 0 1px rgba(9, 30, 66, 0.2);
+    }
+
+    [data-theme="dark"] {
+      --ds-background-default: #1D2125;
+      --ds-surface: #22272B;
+      --ds-surface-hovered: #282E33;
+      --ds-surface-pressed: #2C333A;
+      --ds-surface-sunken: #161A1D;
+      
+      --ds-border: #38414A;
+      --ds-border-bold: #596773;
+      --ds-border-focused: #00C4BF;
+      
+      --ds-text: #E6EDF5;
+      --ds-text-subtle: #9FADBC;
+      --ds-text-subtlest: #738496;
+      --ds-text-inverse: #1D2125;
+      
+      --ds-link: #00C4BF;
+      --ds-link-hovered: #1DDAD4;
+      
+      --equiti-teal: #00C4BF;
+      --equiti-teal-hover: #1DDAD4;
+      --equiti-teal-subtle: rgba(0, 196, 191, 0.12);
+      --equiti-teal-border: rgba(0, 196, 191, 0.3);
+      
+      --ds-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35);
+      --ds-shadow-card-hover: 0 4px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--ds-font-family);
+      background-color: var(--ds-background-default);
+      color: var(--ds-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.45;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .ak-skip-link {
+      position: absolute;
+      top: -60px;
+      left: 16px;
+      background: var(--equiti-teal);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 3px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+      z-index: 1000;
+      transition: top 0.2s;
+    }
+    .ak-skip-link:focus {
+      top: 16px;
+      outline: 2px solid #FFFFFF;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Atlaskit App Header */
+    .ak-header {
+      background: var(--ds-surface);
+      border-bottom: 1px solid var(--ds-border);
+      padding: 10px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .ak-header-inner {
+      max-width: 840px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .ak-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    .ak-logo-svg {
+      height: 24px;
+      width: auto;
+      display: block;
+    }
+    .ak-brand-divider {
+      width: 1px;
+      height: 18px;
+      background-color: var(--ds-border);
+    }
+    .ak-brand-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ds-text);
+    }
+
+    /* Header Actions Container */
+    .ak-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Atlaskit Theme Switcher Button */
+    .ak-theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background: transparent;
+      border: 1px solid var(--ds-border);
+      border-radius: 3px;
+      color: var(--ds-text-subtle);
+      cursor: pointer;
+      transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .ak-theme-toggle:hover {
+      background: var(--ds-surface-hovered);
+      border-color: var(--ds-border-bold);
+      color: var(--ds-text);
+    }
+    .ak-theme-toggle:focus-visible {
+      outline: 2px solid var(--ds-border-focused);
+      outline-offset: 1px;
+    }
+    .theme-icon-sun {
+      display: none;
+    }
+    .theme-icon-moon {
+      display: block;
+    }
+    [data-theme="dark"] .theme-icon-sun {
+      display: block;
+    }
+    [data-theme="dark"] .theme-icon-moon {
+      display: none;
+    }
+
+    /* Atlaskit Primary / Action Button ("View My Requests") */
+    .ak-btn-my-requests {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--equiti-teal-subtle);
+      color: var(--equiti-teal);
+      border: 1px solid var(--equiti-teal);
+      padding: 6px 14px;
+      border-radius: 3px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .ak-btn-my-requests:hover {
+      background: var(--equiti-teal);
+      color: #FFFFFF;
+    }
+    .ak-btn-my-requests:focus-visible {
+      outline: 2px solid var(--ds-border-focused);
+      outline-offset: 1px;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 840px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    /* Hero / Search */
+    .ak-hero {
+      margin-bottom: 24px;
+    }
+    .ak-hero-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--ds-text);
+      margin-bottom: 4px;
+    }
+    .ak-hero-sub {
+      font-size: 13.5px;
+      color: var(--ds-text-subtle);
+      margin-bottom: 18px;
+    }
+
+    /* Atlaskit Search Bar: Rounded Corners (Pill shape) */
+    .ak-search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--ds-surface);
+      border: 2px solid var(--ds-border);
+      border-radius: 24px;
+      padding: 0 16px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .ak-search-container:focus-within {
+      border-color: var(--ds-border-focused);
+      box-shadow: 0 0 0 1px var(--ds-border-focused);
+    }
+    .ak-search-icon {
+      color: var(--ds-text-subtlest);
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .ak-search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 9px 0;
+      font-size: 14px;
+      color: var(--ds-text);
+      outline: none;
+      font-family: inherit;
+    }
+    .ak-search-input::placeholder {
+      color: var(--ds-text-subtlest);
+    }
+    .ak-search-clear {
+      background: transparent;
+      border: none;
+      color: var(--ds-text-subtlest);
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .ak-search-clear:hover {
+      color: var(--ds-text);
+      background: var(--ds-surface-sunken);
+    }
+    .ak-search-clear.visible {
+      display: flex;
+    }
+
+    /* Atlaskit Breadcrumbs Bar */
+    .ak-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--ds-border);
+    }
+    .ak-breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .ak-breadcrumb-btn {
+      background: transparent;
+      border: none;
+      color: var(--ds-text-subtle);
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+      text-decoration: none;
+    }
+    .ak-breadcrumb-btn:hover {
+      color: var(--equiti-teal);
+      text-decoration: underline;
+    }
+    .ak-breadcrumb-current {
+      color: var(--ds-text);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .ak-breadcrumb-sep {
+      color: var(--ds-text-subtlest);
+      user-select: none;
+      font-size: 12px;
+    }
+
+    .ak-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: transparent;
+      border: 1px solid var(--ds-border);
+      color: var(--ds-text);
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background-color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .ak-back-btn:hover {
+      background: var(--ds-surface-hovered);
+      border-color: var(--ds-border-bold);
+    }
+
+    /* View Header */
+    .ak-view-header {
+      margin-bottom: 16px;
+    }
+    .ak-view-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ds-text);
+      margin-bottom: 4px;
+    }
+    .ak-view-desc {
+      font-size: 13px;
+      color: var(--ds-text-subtle);
+    }
+
+    /* Atlaskit Card List */
+    .ak-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Atlaskit Action Card */
+    .ak-card {
+      display: flex;
+      align-items: center;
+      background: var(--ds-surface);
+      border: 1px solid var(--ds-border);
+      border-radius: 4px;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--ds-shadow-card);
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s, transform 0.15s;
+      cursor: pointer;
+    }
+    .ak-card:hover {
+      background: var(--ds-surface-hovered);
+      border-color: var(--equiti-teal);
+      box-shadow: var(--ds-shadow-card-hover);
+      transform: translateY(-1px);
+    }
+    .ak-card:focus-visible {
+      outline: 2px solid var(--ds-border-focused);
+      outline-offset: 1px;
+    }
+
+    .ak-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      background: var(--equiti-teal-subtle);
+      color: var(--equiti-teal);
+      border: 1px solid var(--equiti-teal-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-right: 14px;
+    }
+    .ak-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .ak-card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ds-text);
+      margin-bottom: 2px;
+    }
+    .ak-card-desc {
+      font-size: 13px;
+      color: var(--ds-text-subtle);
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ak-card-arrow {
+      color: var(--ds-text-subtlest);
+      margin-left: 12px;
+      flex-shrink: 0;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .ak-card:hover .ak-card-arrow {
+      color: var(--equiti-teal);
+      transform: translateX(3px);
+    }
+
+    /* Fallback Bar on Home */
+    .ak-home-fallback {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ds-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--ds-text-subtle);
+    }
+    .ak-home-fallback a {
+      color: var(--equiti-teal);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ak-home-fallback a:hover {
+      text-decoration: underline;
+    }
+
+    /* Smart Fallback Banner for Search */
+    .ak-smart-fallback {
+      background: var(--ds-surface);
+      border: 1px solid var(--equiti-teal-border);
+      border-left: 4px solid var(--equiti-teal);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--ds-shadow-card);
+    }
+    .ak-smart-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--equiti-teal);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ak-smart-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ds-text);
+      margin-bottom: 4px;
+    }
+    .ak-smart-desc {
+      font-size: 13px;
+      color: var(--ds-text-subtle);
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    /* Footer: Minimal Atlaskit text with Dynamic Year */
+    footer {
+      border-top: 1px solid var(--ds-border);
+      padding: 16px 24px;
+      font-size: 12px;
+      color: var(--ds-text-subtlest);
+      background: var(--ds-surface);
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .ak-card-desc {
+        white-space: normal;
+      }
+      .ak-brand-title {
+        display: none;
+      }
+      main {
+        padding: 20px 14px 40px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Embedded Equiti SVG Logo -->
-        <svg class="logo" viewBox="0 0 141 41" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M132.28 0.823936H138.963C139.101 0.821165 139.238 0.846481 139.366 0.898346C139.494 0.950211 139.61 1.02754 139.707 1.12565C139.805 1.22375 139.881 1.34058 139.931 1.46904C139.982 1.5975 140.006 1.73492 140.002 1.87294V30.1129C140.002 30.5619 139.631 30.9369 138.963 30.9369H132.282C132.074 30.9092 131.881 30.8132 131.733 30.6642C131.585 30.5151 131.491 30.3213 131.465 30.1129V1.87294C131.449 1.62834 131.523 1.38637 131.674 1.19298C131.825 0.999598 132.041 0.868266 132.282 0.823936" fill="#00AFAA"/>
-            <path d="M93.7541 0.823975H100.435C100.676 0.868305 100.893 0.999637 101.043 1.19302C101.194 1.38641 101.268 1.62838 101.252 1.87297V30.113C101.251 30.33 101.165 30.5379 101.012 30.692C100.859 30.8461 100.652 30.9341 100.435 30.937H93.7541C93.51 30.9502 93.2695 30.8736 93.0781 30.7216C92.8866 30.5696 92.7575 30.3527 92.7151 30.112V1.87297C92.7194 1.59782 92.8299 1.33499 93.0236 1.13948C93.2172 0.943964 93.479 0.830911 93.7541 0.823975Z" fill="#00AFAA"/>
-            <path d="M119.364 8.68894H125.822C126.03 8.66116 126.223 8.56524 126.371 8.41617C126.519 8.26709 126.613 8.07325 126.639 7.86494V1.87294C126.668 1.62577 126.599 1.37705 126.446 1.18069C126.293 0.984336 126.069 0.856157 125.822 0.823936H106.893C106.755 0.821165 106.618 0.846481 106.49 0.898346C106.362 0.950211 106.246 1.02754 106.149 1.12565C106.051 1.22375 105.975 1.34058 105.925 1.46904C105.874 1.5975 105.85 1.73492 105.854 1.87294V7.78994C105.854 8.23894 106.225 8.61394 106.893 8.61394H110.901V20.2999C110.977 23.2825 112.229 26.1141 114.385 28.1769C116.54 30.2397 119.424 31.3663 122.407 31.3109H125.822C126.03 31.2832 126.223 31.1872 126.371 31.0382C126.519 30.8891 126.613 30.6953 126.639 30.4869V23.8949C126.638 23.6779 126.552 23.47 126.399 23.3159C126.246 23.1618 126.039 23.0738 125.822 23.0709H123.372C122.353 23.0336 121.382 22.6244 120.644 21.9207C119.906 21.2169 119.45 20.2673 119.364 19.2509V8.68894Z" fill="#00AFAA"/>
-            <path d="M88.335 1.72397C88.3339 1.50696 88.2477 1.29903 88.0949 1.14492C87.9421 0.990814 87.735 0.902855 87.518 0.899975H80.689C80.4809 0.927749 80.2878 1.02367 80.14 1.17274C79.9922 1.32182 79.898 1.51566 79.872 1.72397V22.547C78.4075 23.4273 76.7524 23.9418 75.047 24.047C74.4995 24.0755 73.952 23.9918 73.4381 23.801C72.9242 23.6102 72.4547 23.3164 72.0585 22.9376C71.6623 22.5588 71.3476 22.103 71.134 21.5981C70.9203 21.0933 70.8121 20.5501 70.816 20.002V1.87297C70.8452 1.62596 70.7759 1.37738 70.6232 1.18105C70.4705 0.984717 70.2466 0.856435 70 0.823975H63.171C62.9299 0.868305 62.7135 0.999637 62.5629 1.19302C62.4122 1.38641 62.3379 1.62838 62.354 1.87297V19.473C62.3453 22.4784 63.4874 25.3732 65.546 27.563C65.9028 28.0979 66.3874 28.5355 66.956 28.836C68.9762 30.3855 71.4623 31.2041 74.008 31.158H75.418C78.9962 31.2287 82.5532 30.5921 85.885 29.285C87.667 28.461 88.112 27.785 88.112 25.914L88.335 1.72397Z" fill="#00AFAA"/>
-            <path d="M18.558 12.509H8.537V11.236C8.537 11.236 8.76 7.191 12.768 7.191H14.55C18.558 7.191 18.558 11.236 18.558 11.236V12.509ZM27.02 11.685C27.023 10.1523 26.7239 8.63396 26.1397 7.21693C25.5554 5.7999 24.6976 4.51193 23.6152 3.42668C22.5329 2.34143 21.2472 1.48019 19.8317 0.89221C18.4162 0.304231 16.8987 0.00104846 15.366 0H11.729C8.62942 0.0114979 5.65943 1.2449 3.46356 3.43252C1.2677 5.62015 0.0231486 8.58549 1.22562e-06 11.685V19.325C-0.0284886 22.4751 1.18763 25.5091 3.38398 27.7674C5.58032 30.0258 8.57932 31.3258 11.729 31.385H13.729C19.593 31.385 23.829 29.512 26.051 26.067C26.868 24.344 26.422 23.295 25.012 22.696L22.2 20.974C20.567 20.15 19.973 20.374 19.008 21.798C17.82 23.298 16.187 23.898 13.738 23.898H12.545C8.537 23.898 8.537 19.853 8.537 19.853V18.8H24.051C24.4599 18.8554 24.876 18.8164 25.2675 18.6859C25.6589 18.5554 26.0153 18.3369 26.3091 18.0472C26.603 17.7575 26.8265 17.4043 26.9626 17.0147C27.0986 16.6252 27.1436 16.2096 27.094 15.8L27.02 11.68V11.685Z" fill="#00AFAA"/>
-            <path d="M55.455 2.1C52.245 0.788574 48.8217 0.0768062 45.355 0V7.191H47.137C47.4074 7.19374 47.6744 7.25068 47.9224 7.35844C48.1704 7.46621 48.3942 7.62262 48.5807 7.81841C48.7672 8.01421 48.9125 8.24541 49.008 8.49835C49.1036 8.75129 49.1474 9.02082 49.137 9.291V21.8C49.1454 22.3423 48.9405 22.8663 48.5665 23.259C48.1924 23.6518 47.6791 23.882 47.137 23.9H45.355V31.316C46.6528 31.2861 47.945 31.1358 49.215 30.867V38.957C49.1858 39.2042 49.2552 39.4529 49.4081 39.6492C49.561 39.8456 49.7852 39.9738 50.032 40.006H56.713C56.8518 40.0092 56.9898 39.984 57.1186 39.932C57.2473 39.8799 57.364 39.8021 57.4616 39.7033C57.5592 39.6045 57.6356 39.4868 57.686 39.3575C57.7364 39.2281 57.7599 39.0898 57.755 38.951V5.468C57.681 3.368 57.31 2.768 55.455 2.097" fill="#00AFAA"/>
-            <path d="M42.386 23.97C41.8529 23.9268 41.3543 23.6888 40.9855 23.3015C40.6166 22.9142 40.4032 22.4046 40.386 21.87V9.288C40.3776 8.74567 40.5825 8.22173 40.9565 7.82896C41.3306 7.43619 41.8439 7.20602 42.386 7.188H44.168V0H43.574C37.116 0 32.068 5.094 31.697 11.685V19.325C31.7018 22.4905 32.9489 25.5276 35.1701 27.783C37.3913 30.0384 40.409 31.3318 43.574 31.385H44.168V23.97H42.386Z" fill="#00AFAA"/>
-        </svg>
+  <!-- Accessibility Skip Navigation -->
+  <a href="#main-content" class="ak-skip-link">Skip to main content</a>
 
-        <h1>Equiti Service Desk</h1>
-        <p>Click below to securely open the service desk portal in your browser.</p>
-        
-        <a href="https://equitiglobalmarkets.atlassian.net/servicedesk/customer/page/e80c2011/Service+Desk+Home" target="_blank" class="btn">Raise a Request</a>
-        
-        <a href="https://equitiglobalmarkets.atlassian.net/servicedesk/customer/user/requests" target="_blank" class="btn btn-secondary">My Requests</a>
+  <!-- Atlaskit Top Navigation Header -->
+  <header class="ak-header">
+    <div class="ak-header-inner">
+      <div class="ak-brand" id="brand-home-btn" role="button" tabindex="0" aria-label="Go to Service Desk Home">
+        <!-- Equiti SVG Brand Logo -->
+        <svg class="ak-logo-svg" viewBox="0 0 141 41" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Equiti Logo">
+          <path d="M132.28 0.823936H138.963C139.101 0.821165 139.238 0.846481 139.366 0.898346C139.494 0.950211 139.61 1.02754 139.707 1.12565C139.805 1.22375 139.881 1.34058 139.931 1.46904C139.982 1.5975 140.006 1.73492 140.002 1.87294V30.1129C140.002 30.5619 139.631 30.9369 138.963 30.9369H132.282C132.074 30.9092 131.881 30.8132 131.733 30.6642C131.585 30.5151 131.491 30.3213 131.465 30.1129V1.87294C131.449 1.62834 131.523 1.38637 131.674 1.19298C131.825 0.999598 132.041 0.868266 132.282 0.823936" fill="#00AFAA"/>
+          <path d="M93.7541 0.823975H100.435C100.676 0.868305 100.893 0.999637 101.043 1.19302C101.194 1.38641 101.268 1.62838 101.252 1.87297V30.113C101.251 30.33 101.165 30.5379 101.012 30.692C100.859 30.8461 100.652 30.9341 100.435 30.937H93.7541C93.51 30.9502 93.2695 30.8736 93.0781 30.7216C92.8866 30.5696 92.7575 30.3527 92.7151 30.112V1.87297C92.7194 1.59782 92.8299 1.33499 93.0236 1.13948C93.2172 0.943964 93.479 0.830911 93.7541 0.823975Z" fill="#00AFAA"/>
+          <path d="M119.364 8.68894H125.822C126.03 8.66116 126.223 8.56524 126.371 8.41617C126.519 8.26709 126.613 8.07325 126.639 7.86494V1.87294C126.668 1.62577 126.599 1.37705 126.446 1.18069C126.293 0.984336 126.069 0.856157 125.822 0.823936H106.893C106.755 0.821165 106.618 0.846481 106.49 0.898346C106.362 0.950211 106.246 1.02754 106.149 1.12565C106.051 1.22375 105.975 1.34058 105.925 1.46904C105.874 1.5975 105.85 1.73492 105.854 1.87294V7.78994C105.854 8.23894 106.225 8.61394 106.893 8.61394H110.901V20.2999C110.977 23.2825 112.229 26.1141 114.385 28.1769C116.54 30.2397 119.424 31.3663 122.407 31.3109H125.822C126.03 31.2832 126.223 31.1872 126.371 31.0382C126.519 30.8891 126.613 30.6953 126.639 30.4869V23.8949C126.638 23.6779 126.552 23.47 126.399 23.3159C126.246 23.1618 126.039 23.0738 125.822 23.0709H123.372C122.353 23.0336 121.382 22.6244 120.644 21.9207C119.906 21.2169 119.45 20.2673 119.364 19.2509V8.68894Z" fill="#00AFAA"/>
+          <path d="M88.335 1.72397C88.3339 1.50696 88.2477 1.29903 88.0949 1.14492C87.9421 0.990814 87.735 0.902855 87.518 0.899975H80.689C80.4809 0.927749 80.2878 1.02367 80.14 1.17274C79.9922 1.32182 79.898 1.51566 79.872 1.72397V22.547C78.4075 23.4273 76.7524 23.9418 75.047 24.047C74.4995 24.0755 73.952 23.9918 73.4381 23.801C72.9242 23.6102 72.4547 23.3164 72.0585 22.9376C71.6623 22.5588 71.3476 22.103 71.134 21.5981C70.9203 21.0933 70.8121 20.5501 70.816 20.002V1.87297C70.8452 1.62596 70.7759 1.37738 70.6232 1.18105C70.4705 0.984717 70.2466 0.856435 70 0.823975H63.171C62.9299 0.868305 62.7135 0.999637 62.5629 1.19302C62.4122 1.38641 62.3379 1.62838 62.354 1.87297V19.473C62.3453 22.4784 63.4874 25.3732 65.546 27.563C65.9028 28.0979 66.3874 28.5355 66.956 28.836C68.9762 30.3855 71.4623 31.2041 74.008 31.158H75.418C78.9962 31.2287 82.5532 30.5921 85.885 29.285C87.667 28.461 88.112 27.785 88.112 25.914L88.335 1.72397Z" fill="#00AFAA"/>
+          <path d="M18.558 12.509H8.537V11.236C8.537 11.236 8.76 7.191 12.768 7.191H14.55C18.558 7.191 18.558 11.236 18.558 11.236V12.509ZM27.02 11.685C27.023 10.1523 26.7239 8.63396 26.1397 7.21693C25.5554 5.7999 24.6976 4.51193 23.6152 3.42668C22.5329 2.34143 21.2472 1.48019 19.8317 0.89221C18.4162 0.304231 16.8987 0.00104846 15.366 0H11.729C8.62942 0.0114979 5.65943 1.2449 3.46356 3.43252C1.2677 5.62015 0.0231486 8.58549 1.22562e-06 11.685V19.325C-0.0284886 22.4751 1.18763 25.5091 3.38398 27.7674C5.58032 30.0258 8.57932 31.3258 11.729 31.385H13.729C19.593 31.385 23.829 29.512 26.051 26.067C26.868 24.344 26.422 23.295 25.012 22.696L22.2 20.974C20.567 20.15 19.973 20.374 19.008 21.798C17.82 23.298 16.187 23.898 13.738 23.898H12.545C8.537 23.898 8.537 19.853 8.537 19.853V18.8H24.051C24.4599 18.8554 24.876 18.8164 25.2675 18.6859C25.6589 18.5554 26.0153 18.3369 26.3091 18.0472C26.603 17.7575 26.8265 17.4043 26.9626 17.0147C27.0986 16.6252 27.1436 16.2096 27.094 15.8L27.02 11.68V11.685Z" fill="#00AFAA"/>
+          <path d="M55.455 2.1C52.245 0.788574 48.8217 0.0768062 45.355 0V7.191H47.137C47.4074 7.19374 47.6744 7.25068 47.9224 7.35844C48.1704 7.46621 48.3942 7.62262 48.5807 7.81841C48.7672 8.01421 48.9125 8.24541 49.008 8.49835C49.1036 8.75129 49.1474 9.02082 49.137 9.291V21.8C49.1454 22.3423 48.9405 22.8663 48.5665 23.259C48.1924 23.6518 47.6791 23.882 47.137 23.9H45.355V31.316C46.6528 31.2861 47.945 31.1358 49.215 30.867V38.957C49.1858 39.2042 49.2552 39.4529 49.4081 39.6492C49.561 39.8456 49.7852 39.9738 50.032 40.006H56.713C56.8518 40.0092 56.9898 39.984 57.1186 39.932C57.2473 39.8799 57.364 39.8021 57.4616 39.7033C57.5592 39.6045 57.6356 39.4868 57.686 39.3575C57.7364 39.2281 57.7599 39.0898 57.755 38.951V5.468C57.681 3.368 57.31 2.768 55.455 2.097" fill="#00AFAA"/>
+          <path d="M42.386 23.97C41.8529 23.9268 41.3543 23.6888 40.9855 23.3015C40.6166 22.9142 40.4032 22.4046 40.386 21.87V9.288C40.3776 8.74567 40.5825 8.22173 40.9565 7.82896C41.3306 7.43619 41.8439 7.20602 42.386 7.188H44.168V0H43.574C37.116 0 32.068 5.094 31.697 11.685V19.325C31.7018 22.4905 32.9489 25.5276 35.1701 27.783C37.3913 30.0384 40.409 31.3318 43.574 31.385H44.168V23.97H42.386Z" fill="#00AFAA"/>
+        </svg>
+        <div class="ak-brand-divider" aria-hidden="true"></div>
+        <div class="ak-brand-title">Service Desk</div>
+      </div>
+
+      <!-- Header Actions: Theme Switcher & Always-Visible "View My Requests" -->
+      <div class="ak-header-actions">
+        <button type="button" class="ak-theme-toggle" id="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <a href="https://equitiglobalmarkets.atlassian.net/servicedesk/customer/user/requests" target="_blank" rel="noopener noreferrer" class="ak-btn-my-requests" id="top-my-requests-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>View My Requests</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
+      </div>
     </div>
+  </header>
+
+  <!-- Main Container -->
+  <main id="main-content">
+    
+    <!-- Hero / Atlaskit Pill Search Bar -->
+    <section class="ak-hero" aria-labelledby="hero-title">
+      <h1 class="ak-hero-title" id="hero-title">Equiti Employee Service Desk</h1>
+      <p class="ak-hero-sub">Welcome. How can we help you today?</p>
+
+      <search role="search">
+        <label for="ak-search-input" class="sr-only">Search services, incidents, and changes</label>
+        <div class="ak-search-container">
+          <svg class="ak-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="search" 
+            id="ak-search-input" 
+            class="ak-search-input" 
+            placeholder="Search across all IT services, hardware, access, changes..." 
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="button" class="ak-search-clear" id="ak-search-clear" aria-label="Clear search input">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </search>
+    </section>
+
+    <!-- Atlaskit Breadcrumbs Bar (Visible in drilldown or search) -->
+    <div class="ak-nav-bar" id="ak-nav-bar" style="display: none;">
+      <nav aria-label="Breadcrumb">
+        <ol class="ak-breadcrumbs" id="ak-breadcrumbs-list"></ol>
+      </nav>
+      <button type="button" class="ak-back-btn" id="ak-back-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back</span>
+      </button>
+    </div>
+
+    <!-- Dynamic View Container (High performance: Renders active level only) -->
+    <div id="ak-view-container">
+      <div class="ak-view-header">
+        <h2 class="ak-view-title" id="ak-view-title">What can we help you with?</h2>
+        <p class="ak-view-desc" id="ak-view-desc">Select an option below to proceed:</p>
+      </div>
+
+      <div id="ak-smart-banner-wrap" style="display: none;"></div>
+
+      <div class="ak-card-list" id="ak-cards-wrap"></div>
+
+      <!-- Minimal Fallback at the bottom of Home -->
+      <div class="ak-home-fallback" id="ak-home-fallback">
+        <span>Can’t find what you are looking for?</span>
+        <a href="https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/511/create/956" target="_blank" rel="noopener noreferrer">
+          <span>Raise a General Request</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Atlaskit Footer with Dynamic Year & PMO Credit -->
+  <footer>
+    <div>&copy; <span id="current-year"></span> Equiti Group &middot; Designed with ❤️ by the Equiti PMO</div>
+  </footer>
+
+  <script>
+    (function() {
+      // 1. DYNAMIC FOOTER YEAR
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+
+      // 2. COMPACT SVG DICTIONARY (Zero duplicate SVG bloat)
+      const ICONS = {
+        alert: '<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>',
+        wallet: '<rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line>',
+        request: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>',
+        change: '<circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line>',
+        commit: '<circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line>',
+        zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>',
+        shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>',
+        key: '<path d="M21 2l-2 2m-1.5 1.5L16 7l-3-3 1.5-1.5a2.121 2.121 0 0 1 3 0l3.5 3.5a2.121 2.121 0 0 1 0 3L17 13l-3-3"></path><path d="M3 21l3-3m0 0l7-7-3-3-7 7v3h3z"></path>',
+        user: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line>',
+        file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>',
+        device: '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line>',
+        headphones: '<path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>',
+        server: '<rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line>',
+        cpu: '<rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line>',
+        database: '<ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>',
+        briefcase: '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>',
+        terminal: '<polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line>',
+        activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
+        trend: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
+        repeat: '<polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>',
+        layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
+        plus: '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>',
+        link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>',
+        sliders: '<line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>',
+        droplet: '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>',
+        settings: '<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>',
+        help: '<circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>',
+        compass: '<circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>'
+      };
+
+      function renderIcon(name) {
+        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.help}</svg>`;
+      }
+
+      // 3. DRILLDOWN ARCHITECTURE: Pure Categories & Leaves (No subheaders, no chips)
+      const VIEWS = {
+        'home': {
+          title: "What can we help you with?",
+          desc: "Select an option below to proceed:",
+          parent: null,
+          items: [
+            { id: "incident", title: "Report an Incident", desc: "Report system outages, operational degradations, or Equiti Pay issues.", icon: "alert", type: "drill", target: "incident" },
+            { id: "request", title: "Raise a Request", desc: "Request hardware, access permissions, database VMs, or trading setups.", icon: "request", type: "drill", target: "request" },
+            { id: "change", title: "Raise a Change", desc: "Submit Standard, Normal, or Emergency production changes for CAB approval.", icon: "change", type: "drill", target: "change" }
+          ]
+        },
+        'incident': {
+          title: "Report an Incident",
+          desc: "Select the type of incident to report:",
+          parent: "home",
+          items: [
+            { id: "inc-equiti", title: "Equiti Incident", desc: "Raise an incident related to Equiti’s core products and operational services.", icon: "alert", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/487" },
+            { id: "inc-pay", title: "Equiti Pay Incident", desc: "Raise an incident related to Equiti Pay’s gateway, deposits, or wallet services.", icon: "wallet", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488" }
+          ]
+        },
+        'change': {
+          title: "Raise a Change",
+          desc: "Select the change classification for Change Advisory Board (CAB) review:",
+          parent: "home",
+          items: [
+            { id: "chg-std", title: "Standard Change", desc: "Short approval process consisting of routine, pre-approved BAU-related changes.", icon: "commit", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/406/create/522" },
+            { id: "chg-norm", title: "Normal Change", desc: "Regular approval of changes; any PROD environment change should be submitted here.", icon: "change", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/406/create/523" },
+            { id: "chg-emg", title: "Emergency Change", desc: "High / critical approvals obtained post-change for urgent production hotfixes.", icon: "zap", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/406/create/524" }
+          ]
+        },
+        'request': {
+          title: "Raise a Request",
+          desc: "Select a category below or submit a general inquiry:",
+          parent: "home",
+          items: [
+            { id: "req-sec", title: "Security & Access Management", desc: "CRM accounts, SQL reporting permissions, MT4/MT5 Manager credentials.", icon: "shield", type: "drill", target: "request-access" },
+            { id: "req-tech", title: "Technology Services", desc: "IT Service Desk, New Devices, Infrastructure VMs, Databases, and Business Support.", icon: "device", type: "drill", target: "request-tech" },
+            { id: "req-trade", title: "Trading Platform Support", desc: "Platform operations, MT4/MT5 groups, NOP adjustments, Book Moves, and Liquidity.", icon: "activity", type: "drill", target: "request-trading" },
+            { id: "req-devops", title: "DevOps Request", desc: "DevOps incidents, pipeline assistance, AWS/cloud access, and technical consultation.", icon: "terminal", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999" },
+            { id: "req-gen", title: "General Service Request", desc: "Don’t find what you’re looking for? Submit a general inquiry and we will route it.", icon: "help", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/511/create/956" }
+          ]
+        },
+        'request-access': {
+          title: "Security & Access Management",
+          desc: "Request system credentials, role permissions, or reporting access:",
+          parent: "request",
+          items: [
+            { id: "acc-mgr", title: "MT4 / MT5 Manager User Access", desc: "Request administrative credentials for MetaTrader 4 or 5 Manager.", icon: "shield", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/476/create/641" },
+            { id: "acc-crm", title: "CRM User Creation", desc: "Request creation or role assignment for an internal CRM user account.", icon: "user", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/476/create/643" },
+            { id: "acc-sql", title: "SQL Report Access", desc: "Request query or reporting access for business intelligence and SQL analytics.", icon: "file", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/476/create/642" },
+            { id: "acc-gen", title: "System Access - General Request", desc: "Can’t find what you need? Raise a general system or permission request.", icon: "key", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/476/create/605" }
+          ]
+        },
+        'request-tech': {
+          title: "Technology Services",
+          desc: "Select a department or support area:",
+          parent: "request",
+          items: [
+            { id: "tech-sd", title: "Service Desk & Hardware", desc: "Request new computers, laptops, smartphones, or general office IT help.", icon: "device", type: "drill", target: "tech-servicedesk" },
+            { id: "tech-infra", title: "Infrastructure & Hosting", desc: "Provision virtual machines, request database access, or infrastructure support.", icon: "server", type: "drill", target: "tech-infrastructure" },
+            { id: "tech-biz", title: "Business Support", desc: "Finance, operations, legal, procurement, and administrative service requests.", icon: "briefcase", type: "drill", target: "tech-business" }
+          ]
+        },
+        'tech-servicedesk': {
+          title: "Service Desk & Hardware",
+          desc: "Hardware provisioning and general IT support:",
+          parent: "request-tech",
+          items: [
+            { id: "sd-dev", title: "New Device Request", desc: "Request a computer, laptop, monitor, peripherals, or corporate smartphone.", icon: "device", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/744" },
+            { id: "sd-gen", title: "IT Support General Request", desc: "General IT helpdesk inquiries, office software, printer, or peripheral support.", icon: "headphones", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/743" }
+          ]
+        },
+        'tech-infrastructure': {
+          title: "Infrastructure & Hosting",
+          desc: "Virtual machines, database credentials, and server infrastructure:",
+          parent: "request-tech",
+          items: [
+            { id: "inf-vm", title: "New VM Creation", desc: "Request provisioning of a new Virtual Machine instance (Linux or Windows).", icon: "cpu", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/710" },
+            { id: "inf-db", title: "Database Access", desc: "Request schema, connection credentials, or access to database instances.", icon: "database", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/677" },
+            { id: "inf-gen", title: "Infrastructure General Request", desc: "Network routing, firewall rules, DNS, or general infrastructure support.", icon: "server", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/676" }
+          ]
+        },
+        'tech-business': {
+          title: "Business Support",
+          desc: "Corporate business operations and administrative support:",
+          parent: "request-tech",
+          items: [
+            { id: "biz-req", title: "Business Support Request", desc: "Finance, corporate tools, operations, procurement, or administrative requests.", icon: "briefcase", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/607" }
+          ]
+        },
+        'request-trading': {
+          title: "Trading Platform Support",
+          desc: "Select operations or onboarding to proceed:",
+          parent: "request",
+          items: [
+            { id: "trade-ops", title: "Platform Operations", desc: "NOP exposure adjustments, client book moves, and live pricing/spread operations.", icon: "activity", type: "drill", target: "trading-operations" },
+            { id: "trade-onb", title: "Platform Onboarding & Liquidity", desc: "MetaTrader groups, instrument onboarding, LP connections, and liquidity pools.", icon: "compass", type: "drill", target: "trading-onboarding" }
+          ]
+        },
+        'trading-operations': {
+          title: "Platform Operations",
+          desc: "Live trading operations and position risk adjustments:",
+          parent: "request-trading",
+          items: [
+            { id: "ops-nop", title: "NOP Request", desc: "Raise an NOP (Net Open Position) limit or exposure adjustment request.", icon: "trend", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/745" },
+            { id: "ops-book", title: "Book Move", desc: "Request client account book routing transfers (A-Book / B-Book).", icon: "repeat", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/746" },
+            { id: "ops-gen", title: "Platform Operations General Request", desc: "Execution pricing, quotes, spread configuration, and dealer operations.", icon: "activity", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606" }
+          ]
+        },
+        'trading-onboarding': {
+          title: "Platform Onboarding & Liquidity",
+          desc: "MetaTrader setup, symbols, liquidity providers, and profiles:",
+          parent: "request-trading",
+          items: [
+            { id: "onb-mt4", title: "MT4 Group", desc: "Request creation or configuration of a MetaTrader 4 server group.", icon: "layers", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/752" },
+            { id: "onb-mt5", title: "MT5 Group", desc: "Request creation or configuration of a MetaTrader 5 server group.", icon: "layers", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/753" },
+            { id: "onb-inst", title: "New Instrument", desc: "Onboard and configure a new trading symbol, asset pair, or CFD.", icon: "plus", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/751" },
+            { id: "onb-lp", title: "LP Onboarding", desc: "Connect and integrate a new Liquidity Provider (LP) feed or FIX connection.", icon: "link", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/748" },
+            { id: "onb-lqp", title: "LQ Profiles", desc: "Configure liquidity profiles, markup tables, and pricing streams.", icon: "sliders", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/750" },
+            { id: "onb-pool", title: "LQ Pool", desc: "Configure liquidity aggregation pools and pricing routing rules.", icon: "droplet", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/749" },
+            { id: "onb-setup", title: "Setup Onboarding", desc: "Initiate institutional setup or white label technical onboarding.", icon: "settings", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/922" },
+            { id: "onb-gen", title: "Platform Onboarding General Request", desc: "Can’t find what you need? Raise a general trading platform onboarding ticket.", icon: "compass", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/747" }
+          ]
+        }
+      };
+
+      // 4. SEARCHABLE CATALOG & TEAM FALLBACKS
+      const SEARCH_INDEX = [];
+      Object.keys(VIEWS).forEach(k => {
+        VIEWS[k].items.forEach(item => {
+          if (item.type === 'link') {
+            SEARCH_INDEX.push({
+              title: item.title,
+              desc: item.desc,
+              url: item.url,
+              icon: item.icon,
+              path: VIEWS[k].title,
+              tokens: (item.title + ' ' + item.desc + ' ' + VIEWS[k].title).toLowerCase()
+            });
+          }
+        });
+      });
+
+      const TEAM_RULES = [
+        { name: "Security & Access", keys: ["security", "access", "permission", "password", "vpn", "mfa", "login", "crm", "auth"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/476/create/605", title: "System Access - General Request" },
+        { name: "IT Service Desk", keys: ["device", "laptop", "pc", "computer", "phone", "hardware", "printer", "wifi", "outlook", "teams"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/743", title: "IT Support General Request" },
+        { name: "Infrastructure", keys: ["infra", "server", "vm", "linux", "windows", "database", "sql", "network", "firewall", "dns"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/676", title: "Infrastructure General Request" },
+        { name: "Trading Platform", keys: ["trading", "mt4", "mt5", "nop", "book move", "lp", "lq", "liquidity", "instrument", "spread"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606", title: "Platform Operations General Request" },
+        { name: "DevOps", keys: ["devops", "pipeline", "ci", "cd", "docker", "k8s", "aws", "git", "deploy"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
+        { name: "Business Support", keys: ["business", "finance", "hr", "billing", "legal", "procurement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/607", title: "Business Support Request" },
+        { name: "Equiti Pay Support", keys: ["pay", "equiti pay", "psp", "payment", "deposit", "withdrawal", "wallet"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488", title: "Equiti Pay Incident" }
+      ];
+
+      const UNIVERSAL_FALLBACK = {
+        title: "General Service Request",
+        desc: "Don’t find what you’re looking for? Submit a general inquiry and we will route it.",
+        url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/511/create/956",
+        icon: "help"
+      };
+
+      // 5. DOM ELEMENTS
+      let currentView = 'home';
+      let previousView = 'home';
+
+      const navBar = document.getElementById('ak-nav-bar');
+      const breadcrumbsList = document.getElementById('ak-breadcrumbs-list');
+      const backBtn = document.getElementById('ak-back-btn');
+      const brandHomeBtn = document.getElementById('brand-home-btn');
+      const viewTitle = document.getElementById('ak-view-title');
+      const viewDesc = document.getElementById('ak-view-desc');
+      const cardsWrap = document.getElementById('ak-cards-wrap');
+      const smartBannerWrap = document.getElementById('ak-smart-banner-wrap');
+      const homeFallback = document.getElementById('ak-home-fallback');
+      const searchInput = document.getElementById('ak-search-input');
+      const searchClear = document.getElementById('ak-search-clear');
+
+      // 6. CARD GENERATOR
+      function renderCard(item) {
+        if (item.type === 'drill') {
+          return `
+            <div class="ak-card" role="button" tabindex="0" data-drill="${item.target}" aria-label="${item.title}">
+              <div class="ak-card-icon">${renderIcon(item.icon)}</div>
+              <div class="ak-card-body">
+                <div class="ak-card-title">${item.title}</div>
+                <div class="ak-card-desc">${item.desc}</div>
+              </div>
+              <div class="ak-card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="ak-card" aria-label="${item.title}">
+              <div class="ak-card-icon">${renderIcon(item.icon)}</div>
+              <div class="ak-card-body">
+                <div class="ak-card-title">${item.title}</div>
+                <div class="ak-card-desc">${item.desc}</div>
+              </div>
+              <div class="ak-card-arrow" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              </div>
+            </a>
+          `;
+        }
+      }
+
+      // 7. VIEW TRANSITIONS
+      function setView(viewId) {
+        if (viewId !== 'search') previousView = currentView;
+        currentView = viewId;
+
+        smartBannerWrap.style.display = 'none';
+        smartBannerWrap.innerHTML = '';
+
+        if (viewId === 'search') {
+          navBar.style.display = 'flex';
+          homeFallback.style.display = 'none';
+          breadcrumbsList.innerHTML = `
+            <li><button type="button" class="ak-breadcrumb-btn" data-go="${previousView || 'home'}">Home</button></li>
+            <li class="ak-breadcrumb-sep" aria-hidden="true">/</li>
+            <li><span class="ak-breadcrumb-current">Search Results</span></li>
+          `;
+          return;
+        }
+
+        const v = VIEWS[viewId] || VIEWS.home;
+        viewTitle.textContent = v.title;
+        viewDesc.textContent = v.desc;
+        cardsWrap.innerHTML = v.items.map(renderCard).join('');
+
+        if (viewId === 'home') {
+          navBar.style.display = 'none';
+          homeFallback.style.display = 'flex';
+          breadcrumbsList.innerHTML = '';
+        } else {
+          navBar.style.display = 'flex';
+          homeFallback.style.display = 'none';
+
+          // Build Atlaskit breadcrumbs
+          const chain = [];
+          let cur = viewId;
+          while (cur) {
+            chain.unshift({ id: cur, title: VIEWS[cur].title });
+            cur = VIEWS[cur].parent;
+          }
+
+          breadcrumbsList.innerHTML = chain.map((step, idx) => {
+            if (idx === chain.length - 1) {
+              return `<li><span class="ak-breadcrumb-current">${step.title}</span></li>`;
+            } else {
+              return `
+                <li><button type="button" class="ak-breadcrumb-btn" data-go="${step.id}">${step.title}</button></li>
+                <li class="ak-breadcrumb-sep" aria-hidden="true">/</li>
+              `;
+            }
+          }).join('');
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Initial Render
+      setView('home');
+
+      // 8. BREADCRUMBS & NAVIGATION EVENT DELEGATION
+      breadcrumbsList.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-go]');
+        if (btn) {
+          if (searchInput.value) {
+            searchInput.value = '';
+            searchClear.classList.remove('visible');
+          }
+          setView(btn.getAttribute('data-go'));
+        }
+      });
+
+      backBtn.addEventListener('click', () => {
+        if (currentView === 'search') {
+          searchInput.value = '';
+          searchClear.classList.remove('visible');
+          setView(previousView || 'home');
+          return;
+        }
+        const parent = VIEWS[currentView] ? VIEWS[currentView].parent : 'home';
+        setView(parent || 'home');
+      });
+
+      brandHomeBtn.addEventListener('click', () => {
+        if (searchInput.value) {
+          searchInput.value = '';
+          searchClear.classList.remove('visible');
+        }
+        setView('home');
+      });
+      brandHomeBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setView('home');
+        }
+      });
+
+      cardsWrap.addEventListener('click', (e) => {
+        const drill = e.target.closest('[data-drill]');
+        if (drill) setView(drill.getAttribute('data-drill'));
+      });
+      cardsWrap.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const drill = document.activeElement && document.activeElement.closest('[data-drill]');
+          if (drill) {
+            e.preventDefault();
+            setView(drill.getAttribute('data-drill'));
+          }
+        }
+      });
+
+      // 9. LIVE SEARCH & SMART ROUTING FALLBACK
+      function runSearch(raw) {
+        const q = raw.trim().toLowerCase();
+        if (!q) {
+          searchClear.classList.remove('visible');
+          setView(previousView !== 'search' ? previousView : 'home');
+          return;
+        }
+
+        searchClear.classList.add('visible');
+        setView('search');
+
+        const tokens = q.split(/\s+/).filter(Boolean);
+        const matches = SEARCH_INDEX.filter(item => tokens.every(tok => item.tokens.includes(tok)));
+
+        if (matches.length > 0) {
+          viewTitle.textContent = "Search Results";
+          viewDesc.textContent = `Found ${matches.length} matching ${matches.length === 1 ? 'service' : 'services'} for "${raw}":`;
+          smartBannerWrap.style.display = 'none';
+          smartBannerWrap.innerHTML = '';
+          cardsWrap.innerHTML = matches.map(m => renderCard({
+            title: m.title,
+            desc: m.desc,
+            url: m.url,
+            icon: m.icon,
+            type: 'link'
+          })).join('');
+          return;
+        }
+
+        // No direct match -> Smart Team Detection
+        let detected = null;
+        for (const rule of TEAM_RULES) {
+          if (rule.keys.some(k => q.includes(k) || tokens.some(t => k.includes(t)))) {
+            detected = rule;
+            break;
+          }
+        }
+
+        viewTitle.textContent = "Search Results";
+        cardsWrap.innerHTML = '';
+        smartBannerWrap.style.display = 'block';
+
+        if (detected) {
+          viewDesc.textContent = `No exact match for "${raw}". Recommended options below:`;
+          smartBannerWrap.innerHTML = `
+            <div class="ak-smart-fallback">
+              <div class="ak-smart-tag">Department Detected: ${detected.name}</div>
+              <h3 class="ak-smart-title">Looking for ${detected.name} assistance?</h3>
+              <p class="ak-smart-desc">We couldn’t find an exact item named "${raw}", but your request matches the ${detected.name} team. You can raise a department request below, or submit a general service ticket.</p>
+              <div class="ak-card-list">
+                ${renderCard({ title: detected.title, desc: "Submit a general request to the " + detected.name + " team.", url: detected.url, icon: "request", type: "link" })}
+                ${renderCard({ title: UNIVERSAL_FALLBACK.title, desc: UNIVERSAL_FALLBACK.desc, url: UNIVERSAL_FALLBACK.url, icon: UNIVERSAL_FALLBACK.icon, type: "link" })}
+              </div>
+            </div>
+          `;
+        } else {
+          viewDesc.textContent = `No direct services found for "${raw}"`;
+          smartBannerWrap.innerHTML = `
+            <div class="ak-smart-fallback">
+              <div class="ak-smart-tag">General Concierge</div>
+              <h3 class="ak-smart-title">Can’t find what you need?</h3>
+              <p class="ak-smart-desc">No exact match was found for "${raw}". Submit a General Service Request and our IT Service Desk team will review and route it to the right department for you.</p>
+              <div class="ak-card-list">
+                ${renderCard({ title: UNIVERSAL_FALLBACK.title, desc: UNIVERSAL_FALLBACK.desc, url: UNIVERSAL_FALLBACK.url, icon: UNIVERSAL_FALLBACK.icon, type: "link" })}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      searchInput.addEventListener('input', (e) => runSearch(e.target.value));
+      searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        searchInput.focus();
+        runSearch('');
+      });
+
+      // 10. THEME SWITCHER & TEAMS THEME SYNC
+      const themeToggleBtn = document.getElementById('theme-toggle');
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (themeToggleBtn) {
+          const isDark = theme === 'dark';
+          themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+          themeToggleBtn.setAttribute('title', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+        }
+      }
+      window.applyAppTheme = applyTheme;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const teamsTheme = urlParams.get('theme');
+      const savedTheme = localStorage.getItem('equiti-servicedesk-theme');
+
+      if (savedTheme) {
+        applyTheme(savedTheme);
+      } else if (teamsTheme === 'dark' || teamsTheme === 'contrast') {
+        applyTheme('dark');
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme('dark');
+      } else {
+        applyTheme('light');
+      }
+
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme') || 'light';
+          const next = current === 'dark' ? 'light' : 'dark';
+          applyTheme(next);
+          try {
+            localStorage.setItem('equiti-servicedesk-theme', next);
+          } catch (e) {}
+        });
+      }
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          if (!localStorage.getItem('equiti-servicedesk-theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      }
+
+    })();
+  </script>
 </body>
 </html>
