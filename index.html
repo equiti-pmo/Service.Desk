@@ -549,6 +549,131 @@
       line-height: 1.45;
     }
 
+    /* ==========================================================================
+       DIRECTIONAL NAVIGATION TRANSITIONS & MICRO-INTERACTIONS
+       ========================================================================== */
+
+    /* Scope View Transitions so sticky header, search box, and footer remain anchored */
+    .ak-header {
+      view-transition-name: ak-header;
+    }
+    .ak-hero {
+      view-transition-name: ak-hero;
+    }
+    .ak-nav-bar {
+      view-transition-name: ak-navbar;
+    }
+    #ak-view-container {
+      view-transition-name: ak-content;
+    }
+
+    ::view-transition-group(ak-header),
+    ::view-transition-group(ak-hero) {
+      animation-duration: 0.05s;
+    }
+
+    ::view-transition-group(ak-navbar) {
+      animation-duration: 0.18s;
+      animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    ::view-transition-group(ak-content) {
+      animation-duration: 0.22s;
+      animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Keyframes for View Transitions API */
+    @keyframes vt-slide-to-left {
+      to { transform: translateX(-24px); opacity: 0; }
+    }
+    @keyframes vt-slide-from-right {
+      from { transform: translateX(24px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes vt-slide-to-right {
+      to { transform: translateX(24px); opacity: 0; }
+    }
+    @keyframes vt-slide-from-left {
+      from { transform: translateX(-24px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Directional View Transitions (Forward: Drill down) */
+    html:active-view-transition-type(forward)::view-transition-old(ak-content) {
+      animation: 0.18s cubic-bezier(0.2, 0, 0, 1) both vt-slide-to-left;
+    }
+    html:active-view-transition-type(forward)::view-transition-new(ak-content) {
+      animation: 0.22s cubic-bezier(0.2, 0, 0, 1) both vt-slide-from-right;
+    }
+
+    /* Directional View Transitions (Backward: Back / Home) */
+    html:active-view-transition-type(backward)::view-transition-old(ak-content) {
+      animation: 0.18s cubic-bezier(0.2, 0, 0, 1) both vt-slide-to-right;
+    }
+    html:active-view-transition-type(backward)::view-transition-new(ak-content) {
+      animation: 0.22s cubic-bezier(0.2, 0, 0, 1) both vt-slide-from-left;
+    }
+
+    /* Crossfade fallback for standard View Transitions without active-view-transition-type */
+    ::view-transition-old(ak-content) {
+      animation: 0.18s ease-out both vt-fade-out;
+    }
+    ::view-transition-new(ak-content) {
+      animation: 0.22s ease-out both vt-fade-in;
+    }
+    @keyframes vt-fade-out {
+      to { opacity: 0; }
+    }
+    @keyframes vt-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* High-Performance CSS Animation Fallback for environments without document.startViewTransition */
+    @keyframes ak-slide-forward {
+      from { transform: translateX(20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes ak-slide-backward {
+      from { transform: translateX(-20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .anim-slide-forward {
+      animation: ak-slide-forward 0.22s cubic-bezier(0.2, 0, 0, 1) both;
+    }
+    .anim-slide-backward {
+      animation: ak-slide-backward 0.22s cubic-bezier(0.2, 0, 0, 1) both;
+    }
+
+    /* Tactile Press Micro-interactions */
+    .ak-card:active {
+      transform: translateY(0) scale(0.995);
+      background: var(--ds-surface-pressed);
+    }
+    .ak-back-btn:active,
+    .ak-breadcrumb-btn:active,
+    .ak-theme-toggle:active {
+      transform: scale(0.96);
+    }
+
+    /* Mandatory accessibility: Respect user preference for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-group(*),
+      ::view-transition-old(*),
+      ::view-transition-new(*),
+      .anim-slide-forward,
+      .anim-slide-backward,
+      .ak-card,
+      .ak-back-btn,
+      .ak-breadcrumb-btn,
+      .ak-theme-toggle {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+
     /* Footer: Minimal Atlaskit text with Dynamic Year */
     footer {
       border-top: 1px solid var(--ds-border);
@@ -958,63 +1083,102 @@
         }
       }
 
-      // 7. VIEW TRANSITIONS
-      function setView(viewId) {
-        if (viewId !== 'search') previousView = currentView;
-        currentView = viewId;
-
-        smartBannerWrap.style.display = 'none';
-        smartBannerWrap.innerHTML = '';
-
-        if (viewId === 'search') {
-          navBar.style.display = 'flex';
-          homeFallback.style.display = 'none';
-          breadcrumbsList.innerHTML = `
-            <li><button type="button" class="ak-breadcrumb-btn" data-go="${previousView || 'home'}">Home</button></li>
-            <li class="ak-breadcrumb-sep" aria-hidden="true">/</li>
-            <li><span class="ak-breadcrumb-current">Search Results</span></li>
-          `;
+      // 7. VIEW TRANSITIONS & DIRECTIONAL NAVIGATION
+      function transitionView(updateDOM, direction) {
+        if (!direction || direction === 'none' || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+          updateDOM();
           return;
         }
 
-        const v = VIEWS[viewId] || VIEWS.home;
-        viewTitle.textContent = v.title;
-        viewDesc.textContent = v.desc;
-        cardsWrap.innerHTML = v.items.map(renderCard).join('');
-
-        if (viewId === 'home') {
-          navBar.style.display = 'none';
-          homeFallback.style.display = 'flex';
-          breadcrumbsList.innerHTML = '';
-        } else {
-          navBar.style.display = 'flex';
-          homeFallback.style.display = 'none';
-
-          // Build Atlaskit breadcrumbs
-          const chain = [];
-          let cur = viewId;
-          while (cur) {
-            chain.unshift({ id: cur, title: VIEWS[cur].title });
-            cur = VIEWS[cur].parent;
+        // 1. Modern View Transitions API with Directional Types
+        if (typeof document.startViewTransition === 'function') {
+          try {
+            document.startViewTransition({
+              update: updateDOM,
+              types: [direction]
+            });
+            return;
+          } catch (e) {
+            // Graceful fallback if types parameter is not supported
+            try {
+              document.startViewTransition(updateDOM);
+              return;
+            } catch (e2) {}
           }
-
-          breadcrumbsList.innerHTML = chain.map((step, idx) => {
-            if (idx === chain.length - 1) {
-              return `<li><span class="ak-breadcrumb-current">${step.title}</span></li>`;
-            } else {
-              return `
-                <li><button type="button" class="ak-breadcrumb-btn" data-go="${step.id}">${step.title}</button></li>
-                <li class="ak-breadcrumb-sep" aria-hidden="true">/</li>
-              `;
-            }
-          }).join('');
         }
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 2. High-Performance CSS Animation Fallback
+        const container = document.getElementById('ak-view-container');
+        if (container) {
+          container.classList.remove('anim-slide-forward', 'anim-slide-backward');
+          void container.offsetWidth; // Force reflow to restart CSS animation
+          updateDOM();
+          container.classList.add(direction === 'forward' ? 'anim-slide-forward' : 'anim-slide-backward');
+        } else {
+          updateDOM();
+        }
       }
 
-      // Initial Render
-      setView('home');
+      function setView(viewId, direction = 'forward') {
+        const performUpdate = () => {
+          if (viewId !== 'search') previousView = currentView;
+          currentView = viewId;
+
+          smartBannerWrap.style.display = 'none';
+          smartBannerWrap.innerHTML = '';
+
+          if (viewId === 'search') {
+            navBar.style.display = 'flex';
+            homeFallback.style.display = 'none';
+            breadcrumbsList.innerHTML = `
+              <li><button type="button" class="ak-breadcrumb-btn" data-go="${previousView || 'home'}">Home</button></li>
+              <li class="ak-breadcrumb-sep" aria-hidden="true">/</li>
+              <li><span class="ak-breadcrumb-current">Search Results</span></li>
+            `;
+            return;
+          }
+
+          const v = VIEWS[viewId] || VIEWS.home;
+          viewTitle.textContent = v.title;
+          viewDesc.textContent = v.desc;
+          cardsWrap.innerHTML = v.items.map(renderCard).join('');
+
+          if (viewId === 'home') {
+            navBar.style.display = 'none';
+            homeFallback.style.display = 'flex';
+            breadcrumbsList.innerHTML = '';
+          } else {
+            navBar.style.display = 'flex';
+            homeFallback.style.display = 'none';
+
+            // Build Atlaskit breadcrumbs
+            const chain = [];
+            let cur = viewId;
+            while (cur) {
+              chain.unshift({ id: cur, title: VIEWS[cur].title });
+              cur = VIEWS[cur].parent;
+            }
+
+            breadcrumbsList.innerHTML = chain.map((step, idx) => {
+              if (idx === chain.length - 1) {
+                return `<li><span class="ak-breadcrumb-current">${step.title}</span></li>`;
+              } else {
+                return `
+                  <li><button type="button" class="ak-breadcrumb-btn" data-go="${step.id}">${step.title}</button></li>
+                  <li class="ak-breadcrumb-sep" aria-hidden="true">/</li>
+                `;
+              }
+            }).join('');
+          }
+
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        transitionView(performUpdate, direction);
+      }
+
+      // Initial Render (no animation on first load)
+      setView('home', 'none');
 
       // 8. BREADCRUMBS & NAVIGATION EVENT DELEGATION
       breadcrumbsList.addEventListener('click', (e) => {
@@ -1024,7 +1188,7 @@
             searchInput.value = '';
             searchClear.classList.remove('visible');
           }
-          setView(btn.getAttribute('data-go'));
+          setView(btn.getAttribute('data-go'), 'backward');
         }
       });
 
@@ -1032,11 +1196,11 @@
         if (currentView === 'search') {
           searchInput.value = '';
           searchClear.classList.remove('visible');
-          setView(previousView || 'home');
+          setView(previousView || 'home', 'backward');
           return;
         }
         const parent = VIEWS[currentView] ? VIEWS[currentView].parent : 'home';
-        setView(parent || 'home');
+        setView(parent || 'home', 'backward');
       });
 
       brandHomeBtn.addEventListener('click', () => {
@@ -1044,25 +1208,29 @@
           searchInput.value = '';
           searchClear.classList.remove('visible');
         }
-        setView('home');
+        if (currentView !== 'home') {
+          setView('home', 'backward');
+        }
       });
       brandHomeBtn.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          setView('home');
+          if (currentView !== 'home') {
+            setView('home', 'backward');
+          }
         }
       });
 
       cardsWrap.addEventListener('click', (e) => {
         const drill = e.target.closest('[data-drill]');
-        if (drill) setView(drill.getAttribute('data-drill'));
+        if (drill) setView(drill.getAttribute('data-drill'), 'forward');
       });
       cardsWrap.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           const drill = document.activeElement && document.activeElement.closest('[data-drill]');
           if (drill) {
             e.preventDefault();
-            setView(drill.getAttribute('data-drill'));
+            setView(drill.getAttribute('data-drill'), 'forward');
           }
         }
       });
@@ -1072,12 +1240,14 @@
         const q = raw.trim().toLowerCase();
         if (!q) {
           searchClear.classList.remove('visible');
-          setView(previousView !== 'search' ? previousView : 'home');
+          setView(previousView !== 'search' ? previousView : 'home', 'backward');
           return;
         }
 
         searchClear.classList.add('visible');
-        setView('search');
+        if (currentView !== 'search') {
+          setView('search', 'forward');
+        }
 
         const tokens = q.split(/\s+/).filter(Boolean);
         const matches = SEARCH_INDEX.filter(item => tokens.every(tok => item.tokens.includes(tok)));
