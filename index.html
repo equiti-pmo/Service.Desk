@@ -1155,7 +1155,7 @@
             const chain = [];
             let cur = viewId;
             while (cur) {
-              chain.unshift({ id: cur, title: VIEWS[cur].title });
+              chain.unshift({ id: cur, title: cur === 'home' ? 'Home' : VIEWS[cur].title });
               cur = VIEWS[cur].parent;
             }
 
