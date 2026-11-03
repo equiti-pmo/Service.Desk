@@ -912,9 +912,8 @@
           parent: "home",
           items: [
             { id: "req-sec", title: "Security & Access Management", desc: "CRM accounts, SQL reporting permissions, MT4/MT5 Manager credentials.", icon: "shield", type: "drill", target: "request-access" },
-            { id: "req-tech", title: "Technology Services", desc: "IT Service Desk, New Devices, Infrastructure VMs, Databases, and Business Support.", icon: "device", type: "drill", target: "request-tech" },
+            { id: "req-tech", title: "Technology Services", desc: "Service Desk, DevOps & Infra Engineering, Infrastructure & Hosting, Business Support.", icon: "device", type: "drill", target: "request-tech" },
             { id: "req-trade", title: "Trading Platform Support", desc: "Platform operations, MT4/MT5 groups, NOP adjustments, Book Moves, and Liquidity.", icon: "activity", type: "drill", target: "request-trading" },
-            { id: "req-devops", title: "DevOps Request", desc: "DevOps incidents, pipeline assistance, AWS/cloud access, and technical consultation.", icon: "terminal", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999" },
             { id: "req-gen", title: "General Service Request", desc: "Don’t find what you’re looking for? Submit a general inquiry and we will route it.", icon: "help", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/511/create/956" }
           ]
         },
@@ -935,8 +934,18 @@
           parent: "request",
           items: [
             { id: "tech-sd", title: "Service Desk & Hardware", desc: "Request new computers, laptops, smartphones, or general office IT help.", icon: "device", type: "drill", target: "tech-servicedesk" },
+            { id: "tech-devops", title: "DevOps & Infra Engineering", desc: "DevOps support, CI/CD pipelines, AWS/cloud access, and infra engineering.", icon: "terminal", type: "drill", target: "tech-devops-infra" },
             { id: "tech-infra", title: "Infrastructure & Hosting", desc: "Provision virtual machines, request database access, or infrastructure support.", icon: "server", type: "drill", target: "tech-infrastructure" },
             { id: "tech-biz", title: "Business Support", desc: "Finance, operations, legal, procurement, and administrative service requests.", icon: "briefcase", type: "drill", target: "tech-business" }
+          ]
+        },
+        'tech-devops-infra': {
+          title: "DevOps & Infra Engineering",
+          desc: "DevOps pipelines, cloud infrastructure, and engineering requests:",
+          parent: "request-tech",
+          items: [
+            { id: "devops-req", title: "DevOps Request", desc: "DevOps incidents, pipeline assistance, AWS/cloud access, and technical consultation.", icon: "terminal", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999" },
+            { id: "infra-eng-req", title: "Infrastructure Engineering Request", desc: "Infrastructure engineering support, cloud architecture, and technical consultation.", icon: "server", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1032" }
           ]
         },
         'tech-servicedesk': {
@@ -1024,7 +1033,7 @@
         { name: "IT Service Desk", keys: ["device", "laptop", "pc", "computer", "phone", "hardware", "printer", "wifi", "outlook", "teams"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/743", title: "IT Support General Request" },
         { name: "Infrastructure", keys: ["infra", "server", "vm", "linux", "windows", "database", "sql", "network", "firewall", "dns"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/676", title: "Infrastructure General Request" },
         { name: "Trading Platform", keys: ["trading", "mt4", "mt5", "nop", "book move", "lp", "lq", "liquidity", "instrument", "spread"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606", title: "Platform Operations General Request" },
-        { name: "DevOps", keys: ["devops", "pipeline", "ci", "cd", "docker", "k8s", "aws", "git", "deploy"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
+        { name: "DevOps & Infra Engineering", keys: ["devops", "pipeline", "ci", "cd", "docker", "k8s", "aws", "git", "deploy", "infrastructure engineering", "infra engineering"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
         { name: "Business Support", keys: ["business", "finance", "hr", "billing", "legal", "procurement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/607", title: "Business Support Request" },
         { name: "Equiti Pay Support", keys: ["pay", "equiti pay", "psp", "payment", "deposit", "withdrawal", "wallet"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488", title: "Equiti Pay Incident" }
       ];
