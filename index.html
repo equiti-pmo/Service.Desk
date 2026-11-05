@@ -977,11 +977,23 @@
         },
         'request-trading': {
           title: "Trading Platform Support",
-          desc: "Select operations or onboarding to proceed:",
+          desc: "Select operations, TOC platforms, or onboarding to proceed:",
           parent: "request",
           items: [
             { id: "trade-ops", title: "Platform Operations", desc: "NOP adjustments, book moves, feeder refresh, server restarts, and trading operations.", icon: "activity", type: "drill", target: "trading-operations" },
+            { id: "trade-toc", title: "TOC Platforms", desc: "Client journals, statements, chart fixes, ManAPI accounts, and TOC requests.", icon: "sliders", type: "drill", target: "trading-toc" },
             { id: "trade-onb", title: "Platform Onboarding & Liquidity", desc: "MetaTrader groups, instrument onboarding, LP connections, and liquidity pools.", icon: "compass", type: "drill", target: "trading-onboarding" }
+          ]
+        },
+        'trading-toc': {
+          title: "TOC Platforms",
+          desc: "Client history, chart synchronization, ManAPI accounts, and platform support:",
+          parent: "request-trading",
+          items: [
+            { id: "toc-journal", title: "Client journal, Statements or History", desc: "Request client account journals, trading activity statements, or historical records.", icon: "file", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1035" },
+            { id: "toc-charts", title: "Sync or Fix Charts", desc: "Request candle synchronization, chart data corrections, or platform chart fixes.", icon: "trend", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1036" },
+            { id: "toc-manapi", title: "New ManAPI Account", desc: "Request creation and provisioning of a new Manager API (ManAPI) account.", icon: "key", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1037" },
+            { id: "toc-gen", title: "TOC Platforms General Request", desc: "Can’t find what you need? Submit a general inquiry to the TOC Platforms team.", icon: "compass", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1038" }
           ]
         },
         'trading-operations': {
@@ -1034,7 +1046,7 @@
         { name: "Security & Access", keys: ["security", "access", "permission", "password", "vpn", "mfa", "login", "crm", "auth"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/476/create/605", title: "System Access - General Request" },
         { name: "IT Service Desk", keys: ["device", "laptop", "pc", "computer", "phone", "hardware", "printer", "wifi", "outlook", "teams"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/743", title: "IT Support General Request" },
         { name: "Infrastructure", keys: ["infra", "server", "vm", "linux", "windows", "database", "sql", "network", "firewall", "dns"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/676", title: "Infrastructure General Request" },
-        { name: "Trading Platform", keys: ["trading", "mt4", "mt5", "nop", "book move", "lp", "lq", "liquidity", "instrument", "spread", "feeder", "restart"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606", title: "Platform Operations General Request" },
+        { name: "Trading Platform", keys: ["trading", "mt4", "mt5", "nop", "book move", "lp", "lq", "liquidity", "instrument", "spread", "feeder", "restart", "toc", "manapi", "chart", "journal", "statement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606", title: "Platform Operations General Request" },
         { name: "DevOps & Infra Engineering", keys: ["devops", "pipeline", "ci", "cd", "docker", "k8s", "aws", "git", "deploy", "infrastructure engineering", "infra engineering"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
         { name: "Business Support", keys: ["business", "finance", "hr", "billing", "legal", "procurement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/607", title: "Business Support Request" },
         { name: "Equiti Pay Support", keys: ["pay", "equiti pay", "psp", "payment", "deposit", "withdrawal", "wallet"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488", title: "Equiti Pay Incident" }
