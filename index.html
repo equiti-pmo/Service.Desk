@@ -884,7 +884,8 @@
           items: [
             { id: "incident", title: "Report an Incident", desc: "Report system outages, operational degradations, or Equiti Pay issues.", icon: "alert", type: "drill", target: "incident" },
             { id: "request", title: "Raise a Request", desc: "Request hardware, access permissions, database VMs, or trading setups.", icon: "request", type: "drill", target: "request" },
-            { id: "change", title: "Raise a Change", desc: "Submit Standard, Normal, or Emergency production changes for CAB approval.", icon: "change", type: "drill", target: "change" }
+            { id: "change", title: "Raise a Change", desc: "Submit Standard, Normal, or Emergency production changes for CAB approval.", icon: "change", type: "drill", target: "change" },
+            { id: "uae-remote", title: "UAE Remote Support", desc: "General Request form with UAE Remote Support pre-filled assigned group", icon: "headphones", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/956?customfield_15478=15408" }
           ]
         },
         'incident': {
@@ -1035,8 +1036,8 @@
               desc: item.desc,
               url: item.url,
               icon: item.icon,
-              path: VIEWS[k].title,
-              tokens: (item.title + ' ' + item.desc + ' ' + VIEWS[k].title + ' ' + item.url).toLowerCase()
+              path: k === 'home' ? 'Home' : VIEWS[k].title,
+              tokens: (item.title + ' ' + item.desc + ' ' + (k === 'home' ? 'Home' : VIEWS[k].title) + ' ' + item.url).toLowerCase()
             });
           }
         });
@@ -1049,7 +1050,8 @@
         { name: "Trading Platform", keys: ["trading", "mt4", "mt5", "nop", "book move", "lp", "lq", "liquidity", "instrument", "spread", "feeder", "restart", "toc", "manapi", "chart", "journal", "statement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606", title: "Platform Operations General Request" },
         { name: "DevOps & Infra Engineering", keys: ["devops", "pipeline", "ci", "cd", "docker", "k8s", "aws", "git", "deploy", "infrastructure engineering", "infra engineering"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
         { name: "Business Support", keys: ["business", "finance", "hr", "billing", "legal", "procurement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/607", title: "Business Support Request" },
-        { name: "Equiti Pay Support", keys: ["pay", "equiti pay", "psp", "payment", "deposit", "withdrawal", "wallet"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488", title: "Equiti Pay Incident" }
+        { name: "Equiti Pay Support", keys: ["pay", "equiti pay", "psp", "payment", "deposit", "withdrawal", "wallet"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488", title: "Equiti Pay Incident" },
+        { name: "UAE Remote Support", keys: ["uae", "remote support", "dubai", "remote"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/956?customfield_15478=15408", title: "UAE Remote Support" }
       ];
 
       const UNIVERSAL_FALLBACK = {
