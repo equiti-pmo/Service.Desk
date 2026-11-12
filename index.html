@@ -841,7 +841,7 @@
     (function() {
       // 1. APPLICATION VERSION & CACHE-BUSTING VERIFICATION
       // Bump APP_VERSION on every release to force browsers and Teams webviews to bypass cache
-      const APP_VERSION = '1.3.0';
+      const APP_VERSION = '1.3.1';
       const versionEl = document.getElementById('app-version');
       if (versionEl) versionEl.textContent = 'v' + APP_VERSION;
 
@@ -950,7 +950,8 @@
           parent: "home",
           items: [
             { id: "req-sec", title: "Security & Access Management", desc: "CRM accounts, SQL reporting permissions, MT4/MT5 Manager credentials.", icon: "shield", type: "drill", target: "request-access" },
-            { id: "req-tech", title: "Technology Services", desc: "Service Desk, Cyber Defence (CDC), DevOps, Infrastructure & Hosting, Business Support.", icon: "device", type: "drill", target: "request-tech" },
+            { id: "req-tech", title: "Technology Services", desc: "Service Desk, DevOps & Infra Engineering, Infrastructure & Hosting, Business Support.", icon: "device", type: "drill", target: "request-tech" },
+            { id: "req-cdc", title: "Cyber Defence Center (CDC)", desc: "Report suspicious activity, emails, email delivery, or website access.", icon: "shield", type: "drill", target: "request-cdc" },
             { id: "req-trade", title: "Trading Platform Support", desc: "Platform operations, MT4/MT5 groups, NOP adjustments, Book Moves, and Liquidity.", icon: "activity", type: "drill", target: "request-trading" },
             { id: "req-gen", title: "General Service Request", desc: "Don’t find what you’re looking for? Submit a general inquiry and we will route it.", icon: "help", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/511/create/956" }
           ]
@@ -972,16 +973,15 @@
           parent: "request",
           items: [
             { id: "tech-sd", title: "Service Desk & Hardware", desc: "Request new computers, laptops, smartphones, or general office IT help.", icon: "device", type: "drill", target: "tech-servicedesk" },
-            { id: "tech-cdc", title: "Cyber Defence Center (CDC)", desc: "Report suspicious activity, emails, email delivery, or website access.", icon: "shield", type: "drill", target: "tech-cdc" },
             { id: "tech-devops", title: "DevOps & Infra Engineering", desc: "DevOps support, CI/CD pipelines, AWS/cloud access, and infra engineering.", icon: "terminal", type: "drill", target: "tech-devops-infra" },
             { id: "tech-infra", title: "Infrastructure & Hosting", desc: "Provision virtual machines, request database access, or infrastructure support.", icon: "server", type: "drill", target: "tech-infrastructure" },
             { id: "tech-biz", title: "Business Support", desc: "Finance, operations, legal, procurement, and administrative service requests.", icon: "briefcase", type: "drill", target: "tech-business" }
           ]
         },
-        'tech-cdc': {
+        'request-cdc': {
           title: "Cyber Defence Center (CDC)",
           desc: "Report security concerns, suspicious activity, or request access filtering:",
-          parent: "request-tech",
+          parent: "request",
           items: [
             { id: "cdc-activity", title: "Suspicious Activity", desc: "Report suspicious system behavior, unauthorized access attempts, or anomalies.", icon: "alert", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1039" },
             { id: "cdc-email", title: "Suspicious Email", desc: "Report suspected phishing, scam, malicious attachments, or spoofed emails.", icon: "alert", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1040" },
