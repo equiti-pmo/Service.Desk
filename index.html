@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Equiti Service Desk</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300AFAA'/><path d='M25 50h50M50 25v50' stroke='white' stroke-width='14' stroke-linecap='round'/></svg>">
 
@@ -831,15 +834,49 @@
 
   <!-- Atlaskit Footer with Dynamic Year & PMO Credit -->
   <footer>
-    <div>&copy; <span id="current-year"></span> Equiti Group &middot; Designed with ❤️ by the Equiti PMO</div>
+    <div>&copy; <span id="current-year"></span> Equiti Group &middot; Designed with ❤️ by the Equiti PMO &middot; <span id="app-version"></span></div>
   </footer>
 
   <script>
     (function() {
-      // 1. DYNAMIC FOOTER YEAR
+      // 1. APPLICATION VERSION & CACHE-BUSTING VERIFICATION
+      // Bump APP_VERSION on every release to force browsers and Teams webviews to bypass cache
+      const APP_VERSION = '1.2.0';
+      const versionEl = document.getElementById('app-version');
+      if (versionEl) versionEl.textContent = 'v' + APP_VERSION;
+
+      (function checkAppVersion() {
+        try {
+          if (typeof fetch !== 'function') return;
+          const reloadKey = 'sd_version_reloaded';
+          const checkUrl = window.location.pathname + (window.location.pathname.endsWith('/') ? '' : '/') + '?_cb=' + Date.now();
+          fetch(checkUrl, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          })
+          .then(res => (res && res.ok ? res.text() : null))
+          .then(html => {
+            if (!html) return;
+            const match = html.match(/const\s+APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+            if (match && match[1] && match[1] !== APP_VERSION) {
+              const serverVersion = match[1];
+              // Avoid infinite reload loops if a proxy misbehaves
+              if (sessionStorage.getItem(reloadKey) !== serverVersion) {
+                sessionStorage.setItem(reloadKey, serverVersion);
+                const url = new URL(window.location.href, window.location.origin || 'https://localhost');
+                url.searchParams.set('v', serverVersion);
+                window.location.replace(url.toString());
+              }
+            }
+          })
+          .catch(() => {});
+        } catch (e) {}
+      })();
+
+      // 2. DYNAMIC FOOTER YEAR
       document.getElementById('current-year').textContent = new Date().getFullYear();
 
-      // 2. COMPACT SVG DICTIONARY (Zero duplicate SVG bloat)
+      // 3. COMPACT SVG DICTIONARY (Zero duplicate SVG bloat)
       const ICONS = {
         alert: '<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>',
         wallet: '<rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line>',
@@ -875,7 +912,7 @@
         return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.help}</svg>`;
       }
 
-      // 3. DRILLDOWN ARCHITECTURE: Pure Categories & Leaves (No subheaders, no chips)
+      // 4. DRILLDOWN ARCHITECTURE: Pure Categories & Leaves (No subheaders, no chips)
       const VIEWS = {
         'home': {
           title: "What can we help you with?",
@@ -1026,7 +1063,7 @@
         }
       };
 
-      // 4. SEARCHABLE CATALOG & TEAM FALLBACKS
+      // 5. SEARCHABLE CATALOG & TEAM FALLBACKS
       const SEARCH_INDEX = [];
       Object.keys(VIEWS).forEach(k => {
         VIEWS[k].items.forEach(item => {
@@ -1061,7 +1098,7 @@
         icon: "help"
       };
 
-      // 5. DOM ELEMENTS
+      // 6. DOM ELEMENTS
       let currentView = 'home';
       let previousView = 'home';
 
@@ -1077,7 +1114,7 @@
       const searchInput = document.getElementById('ak-search-input');
       const searchClear = document.getElementById('ak-search-clear');
 
-      // 6. CARD GENERATOR
+      // 7. CARD GENERATOR
       function renderCard(item) {
         if (item.type === 'drill') {
           return `
@@ -1108,7 +1145,7 @@
         }
       }
 
-      // 7. VIEW TRANSITIONS & DIRECTIONAL NAVIGATION
+      // 8. VIEW TRANSITIONS & DIRECTIONAL NAVIGATION
       function transitionView(updateDOM, direction) {
         if (!direction || direction === 'none' || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
           updateDOM();
@@ -1205,7 +1242,7 @@
       // Initial Render (no animation on first load)
       setView('home', 'none');
 
-      // 8. BREADCRUMBS & NAVIGATION EVENT DELEGATION
+      // 9. BREADCRUMBS & NAVIGATION EVENT DELEGATION
       breadcrumbsList.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-go]');
         if (btn) {
@@ -1260,7 +1297,7 @@
         }
       });
 
-      // 9. LIVE SEARCH & SMART ROUTING FALLBACK
+      // 10. LIVE SEARCH & SMART ROUTING FALLBACK
       function runSearch(raw) {
         const q = raw.trim().toLowerCase();
         if (!q) {
@@ -1340,7 +1377,7 @@
         runSearch('');
       });
 
-      // 10. THEME SWITCHER & TEAMS THEME SYNC
+      // 11. THEME SWITCHER & TEAMS THEME SYNC
       const themeToggleBtn = document.getElementById('theme-toggle');
 
       function applyTheme(theme) {
