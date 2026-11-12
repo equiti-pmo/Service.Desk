@@ -841,7 +841,7 @@
     (function() {
       // 1. APPLICATION VERSION & CACHE-BUSTING VERIFICATION
       // Bump APP_VERSION on every release to force browsers and Teams webviews to bypass cache
-      const APP_VERSION = '1.2.0';
+      const APP_VERSION = '1.3.0';
       const versionEl = document.getElementById('app-version');
       if (versionEl) versionEl.textContent = 'v' + APP_VERSION;
 
@@ -950,7 +950,7 @@
           parent: "home",
           items: [
             { id: "req-sec", title: "Security & Access Management", desc: "CRM accounts, SQL reporting permissions, MT4/MT5 Manager credentials.", icon: "shield", type: "drill", target: "request-access" },
-            { id: "req-tech", title: "Technology Services", desc: "Service Desk, DevOps & Infra Engineering, Infrastructure & Hosting, Business Support.", icon: "device", type: "drill", target: "request-tech" },
+            { id: "req-tech", title: "Technology Services", desc: "Service Desk, Cyber Defence (CDC), DevOps, Infrastructure & Hosting, Business Support.", icon: "device", type: "drill", target: "request-tech" },
             { id: "req-trade", title: "Trading Platform Support", desc: "Platform operations, MT4/MT5 groups, NOP adjustments, Book Moves, and Liquidity.", icon: "activity", type: "drill", target: "request-trading" },
             { id: "req-gen", title: "General Service Request", desc: "Don’t find what you’re looking for? Submit a general inquiry and we will route it.", icon: "help", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/511/create/956" }
           ]
@@ -972,9 +972,22 @@
           parent: "request",
           items: [
             { id: "tech-sd", title: "Service Desk & Hardware", desc: "Request new computers, laptops, smartphones, or general office IT help.", icon: "device", type: "drill", target: "tech-servicedesk" },
+            { id: "tech-cdc", title: "Cyber Defence Center (CDC)", desc: "Report suspicious activity, emails, email delivery, or website access.", icon: "shield", type: "drill", target: "tech-cdc" },
             { id: "tech-devops", title: "DevOps & Infra Engineering", desc: "DevOps support, CI/CD pipelines, AWS/cloud access, and infra engineering.", icon: "terminal", type: "drill", target: "tech-devops-infra" },
             { id: "tech-infra", title: "Infrastructure & Hosting", desc: "Provision virtual machines, request database access, or infrastructure support.", icon: "server", type: "drill", target: "tech-infrastructure" },
             { id: "tech-biz", title: "Business Support", desc: "Finance, operations, legal, procurement, and administrative service requests.", icon: "briefcase", type: "drill", target: "tech-business" }
+          ]
+        },
+        'tech-cdc': {
+          title: "Cyber Defence Center (CDC)",
+          desc: "Report security concerns, suspicious activity, or request access filtering:",
+          parent: "request-tech",
+          items: [
+            { id: "cdc-activity", title: "Suspicious Activity", desc: "Report suspicious system behavior, unauthorized access attempts, or anomalies.", icon: "alert", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1039" },
+            { id: "cdc-email", title: "Suspicious Email", desc: "Report suspected phishing, scam, malicious attachments, or spoofed emails.", icon: "alert", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1040" },
+            { id: "cdc-delivery", title: "Email Delivery", desc: "Inquire about blocked, quarantined, or delayed email delivery.", icon: "file", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1042" },
+            { id: "cdc-website", title: "Website Access", desc: "Request URL unblocking, website categorization review, or web access exceptions.", icon: "link", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1043" },
+            { id: "cdc-gen", title: "Cyber Defence General Request", desc: "Can’t find what you need? Submit a general inquiry to the Cyber Defence Center.", icon: "shield", type: "link", url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1044" }
           ]
         },
         'tech-devops-infra': {
@@ -1085,7 +1098,8 @@
         { name: "IT Service Desk", keys: ["device", "laptop", "pc", "computer", "phone", "hardware", "printer", "wifi", "outlook", "teams"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/743", title: "IT Support General Request" },
         { name: "Infrastructure", keys: ["infra", "server", "vm", "linux", "windows", "database", "sql", "network", "firewall", "dns"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/676", title: "Infrastructure General Request" },
         { name: "Trading Platform", keys: ["trading", "mt4", "mt5", "nop", "book move", "lp", "lq", "liquidity", "instrument", "spread", "feeder", "restart", "toc", "manapi", "chart", "journal", "statement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/477/create/606", title: "Platform Operations General Request" },
-        { name: "DevOps & Infra Engineering", keys: ["devops", "pipeline", "ci", "cd", "docker", "k8s", "aws", "git", "deploy", "infrastructure engineering", "infra engineering"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
+        { name: "DevOps & Infra Engineering", keys: ["devops", "pipeline", "ci", "cd", "ci/cd", "cicd", "docker", "k8s", "aws", "git", "deploy", "infrastructure engineering", "infra engineering"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/999", title: "DevOps Request" },
+        { name: "Cyber Defence Center (CDC)", keys: ["cdc", "cyber", "phishing", "suspicious", "spam", "threat", "soc", "malware", "virus", "quarantine"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/1044", title: "Cyber Defence General Request" },
         { name: "Business Support", keys: ["business", "finance", "hr", "billing", "legal", "procurement"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/478/create/607", title: "Business Support Request" },
         { name: "Equiti Pay Support", keys: ["pay", "equiti pay", "psp", "payment", "deposit", "withdrawal", "wallet"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/group/373/create/488", title: "Equiti Pay Incident" },
         { name: "UAE Remote Support", keys: ["uae", "remote support", "dubai", "remote"], url: "https://equitiglobalmarkets.atlassian.net/servicedesk/customer/portal/173/create/956?customfield_15478=15408", title: "UAE Remote Support" }
@@ -1332,7 +1346,7 @@
         // No direct match -> Smart Team Detection
         let detected = null;
         for (const rule of TEAM_RULES) {
-          if (rule.keys.some(k => q.includes(k) || tokens.some(t => k.includes(t)))) {
+          if (rule.keys.some(k => k.length <= 3 ? tokens.includes(k) : (q.includes(k) || tokens.some(t => t.length > 3 && (k.includes(t) || t.includes(k)))))) {
             detected = rule;
             break;
           }
